@@ -234,6 +234,7 @@ module Ferrum
           returnByValue: true,
           functionDeclaration: <<~JS
             function() {
+              return false;
               if (Array.isArray(this) &&
                   this.every(e => e instanceof Node)) {
                 return false;
