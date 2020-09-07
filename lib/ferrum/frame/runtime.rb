@@ -164,6 +164,7 @@ module Ferrum
       end
 
       def handle_response(response)
+# p response
         case response["type"]
         when "boolean", "number", "string"
           response["value"]
@@ -173,6 +174,7 @@ module Ferrum
           {}
         when "object"
           object_id = response["objectId"]
+# p [:object_id, object_id, response["subtype"]]
 
           case response["subtype"]
           when "node"
@@ -216,9 +218,12 @@ module Ferrum
       end
 
       def reduce_props(object_id, to)
+# p [:reduce_props, to, object_id]
         if cyclic?(object_id).dig("result", "value")
+# p 1
           return to.is_a?(Array) ? [cyclic_object] : cyclic_object
         else
+# p 2
           props = @page.command("Runtime.getProperties", ownProperties: true, objectId: object_id)
           props["result"].reduce(to) do |memo, prop|
             next(memo) unless prop["enumerable"]
@@ -228,29 +233,58 @@ module Ferrum
       end
 
       def cyclic?(object_id)
+# p object_id
         @page.command(
           "Runtime.callFunctionOn",
           objectId: object_id,
           returnByValue: true,
           functionDeclaration: <<~JS
             function() {
+              return false;
               if (Array.isArray(this) &&
                   this.every(e => e instanceof Node)) {
                 return false;
               }
 
               function detectCycle(obj, seen) {
-                if (typeof obj === "object") {
-                  if (seen.indexOf(obj) !== -1) {
-                    return true;
-                  }
-                  for (let key in obj) {
-                    if (obj.hasOwnProperty(key) && detectCycle(obj[key], seen.concat([obj]))) {
-                      return true;
-                    }
+                if (obj === null || typeof(obj) !== "object") {
+                  return false;
+                }
+                if (par && obj === this) {
+                  //const getCircularReplacer = () => {
+                  //  const see = new WeakSet();
+                  //  return (key, value) => {
+                  //    if (typeof value === "object" && value !== null) {
+                  //      if (see.has(value)) {
+                  //        return;
+                  //      }
+                  //      see.add(value);
+                  //    }
+                  //    return value;
+                  //  };
+                  //};
+                  //return [
+                  //  seen.length,
+                  //  seen.indexOf(obj),
+                  //  typeof(par),
+                  //  JSON.stringify([typeof(this), this], getCircularReplacer()).substring(0,500),
+                  //  JSON.stringify([typeof(obj), obj], getCircularReplacer()).substring(0,500),
+                  //  seen.map(function(i){
+                  //    return JSON.stringify([typeof(i), i], getCircularReplacer()).substring(0,80)
+                  //  }),
+                  //  JSON.parse(JSON.stringify([typeof(this), this], getCircularReplacer())),//.substring(0,500),
+                  //];
+                  return true;
+                }
+                if (seen.indexOf(obj) !== -1) {
+                  return false
+                }
+                for (const key of Object.keys(obj)) {
+                  var t = detectCycle(obj[key], seen.concat([obj]));
+                  if (t) {
+                    return t;
                   }
                 }
-
                 return false;
               }
 
