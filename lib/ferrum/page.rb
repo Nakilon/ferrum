@@ -135,19 +135,11 @@ module Ferrum
 
     def resize(width: nil, height: nil, fullscreen: false)
       if fullscreen
-        width, height = document_size
         set_window_bounds(windowState: "fullscreen")
       else
         set_window_bounds(windowState: "normal")
         set_window_bounds(width: width, height: height)
       end
-
-      command("Emulation.setDeviceMetricsOverride", slowmoable: true,
-                                                    width: width,
-                                                    height: height,
-                                                    deviceScaleFactor: 1,
-                                                    mobile: false,
-                                                    fitWindow: false)
     end
 
     #
