@@ -276,7 +276,7 @@ module Ferrum
       inject_extensions
 
       width, height = @browser.window_size
-      resize(width: width, height: height)
+      resize(width: width, height: height, fullscreen: !width)
 
       response = command("Page.getNavigationHistory")
       return unless response.dig("entries", 0, "transitionType") != "typed"
