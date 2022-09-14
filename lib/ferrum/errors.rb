@@ -27,8 +27,12 @@ module Ferrum
   end
 
   class TimeoutError < Error
+    def initialize msg = nil, timeout: nil
+      @timeout = timeout
+      super *msg
+    end
     def message
-      "Timed out waiting for response. It's possible that this happened " \
+      "Timed out waiting for response#{" for #{@timeout} seconds" if @timeout}. It's possible that this happened " \
         "because something took a very long time (for example a page load " \
         "was slow). If so, setting the :timeout option to a higher value might " \
         "help."

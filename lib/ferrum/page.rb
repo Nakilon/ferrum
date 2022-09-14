@@ -177,7 +177,7 @@ module Ferrum
         # the main frame and it started to load new content.
         if iteration != @event.iteration
           set = @event.wait(@browser.timeout)
-          raise TimeoutError unless set
+          raise TimeoutError.new timeout: @browser.timeout unless set
         end
       end
       result
