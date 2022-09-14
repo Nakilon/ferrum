@@ -161,7 +161,11 @@ module Ferrum
             Node.new(self, @page.target_id, node_id, description)
           when "array"
             reduce_props(object_id, []) do |memo, key, value|
-              next(memo) unless Integer(key, exception: false)
+              next(memo) unless begin
+                Integer(key)
+              rescue StandardError
+                nil
+              end
 
               value = value["objectId"] ? handle_response(value) : value["value"]
               memo.insert(key.to_i, value)
