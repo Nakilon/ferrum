@@ -201,9 +201,9 @@ module Ferrum
       def format_options(format, path, quality)
         format ||= path ? File.extname(path).delete(".") : "png"
         format = "jpeg" if format == "jpg"
-        raise "Not supported options `:format` #{format}. jpeg | png" if format !~ /jpeg|png/i
+        raise "Not supported options `:format` #{format}. jpeg | png | webp" if format !~ /\Ajpeg|png|webp\z/i
 
-        quality ||= 75 if format == "jpeg"
+        quality ||= 75 unless format == "png"
 
         [format, quality]
       end
