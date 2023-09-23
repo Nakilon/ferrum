@@ -27,7 +27,7 @@ module Ferrum
       end
 
       def match?(regexp)
-        !!url.match(regexp)
+        not not regexp === url
       end
 
       def respond(**options)
