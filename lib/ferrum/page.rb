@@ -159,14 +159,11 @@ module Ferrum
 
     def resize(width: nil, height: nil, fullscreen: false)
       if fullscreen
-        width, height = document_size
         self.window_bounds = { window_state: "fullscreen" }
       else
         self.window_bounds = { window_state: "normal" }
         self.window_bounds = { width: width, height: height }
       end
-
-      set_viewport(width: width, height: height)
     end
 
     #
